@@ -7,6 +7,7 @@ import com.epam.xstack.models.dto.training_dto.response.TrainingSaveResponseDTO;
 import com.epam.xstack.service.training_service.TrainingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class TrainingController {
                     @ApiResponse(responseCode = "401", description = "Bad credentials")})
     @SaveTrainingEndPointAspectAnnotation
     @PostMapping("/save")
-    public ResponseEntity<TrainingSaveResponseDTO> saveTraining(@RequestBody TrainingSaveRequestDTO requestDTO, BindingResult result) {
+    public ResponseEntity<TrainingSaveResponseDTO> saveTraining(@Valid @RequestBody TrainingSaveRequestDTO requestDTO, BindingResult result) {
         validation.nullValidation(result);
         return new ResponseEntity<>(trainingService.saveTraining(requestDTO), HttpStatus.CREATED);
     }

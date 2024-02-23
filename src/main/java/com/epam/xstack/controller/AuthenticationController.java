@@ -1,5 +1,6 @@
 package com.epam.xstack.controller;
 
+import com.epam.xstack.exceptions.validator.NotNullValidation;
 import com.epam.xstack.models.dto.authentication_dto.AuthenticationChangeLoginRequestDTO;
 import com.epam.xstack.models.dto.authentication_dto.AuthenticationChangeLoginResponseDTO;
 import com.epam.xstack.models.dto.authentication_dto.AuthenticationRequestDTO;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService service;
+    private final NotNullValidation validation;
 
     @Operation(summary = "This request changes login and password",
             responses = {
@@ -29,7 +32,8 @@ public class AuthenticationController {
                     @ApiResponse(responseCode = "403", description = "Access denied, check user name or id"),
                     @ApiResponse(responseCode = "404", description = "User with user name or id not found")})
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponseDTO> authenticate(@RequestBody AuthenticationRequestDTO request) {
+    public ResponseEntity<AuthenticationResponseDTO> authenticate(@Valid @RequestBody AuthenticationRequestDTO request, BindingResult bindingResult) {
+        validation.nullValidation(bindingResult);
         return ResponseEntity.ok(service.authenticate(request));
     }
 
@@ -41,7 +45,8 @@ public class AuthenticationController {
                     @ApiResponse(responseCode = "403", description = "Access denied, check user name or id"),
                     @ApiResponse(responseCode = "404", description = "User with user name or id not found")})
     @PutMapping("/update/{id}")
-    public ResponseEntity<AuthenticationChangeLoginResponseDTO> updateLogin(@PathVariable("id") UUID id, @Valid @RequestBody AuthenticationChangeLoginRequestDTO requestDTO) {
+    public ResponseEntity<AuthenticationChangeLoginResponseDTO> updateLogin(@PathVariable("id") UUID id, @Valid @RequestBody AuthenticationChangeLoginRequestDTO requestDTO, BindingResult bindingResult) {
+        validation.nullValidation(bindingResult);
         return new ResponseEntity<>(service.authenticationChangeLogin(id, requestDTO), HttpStatus.OK);
     }
 
