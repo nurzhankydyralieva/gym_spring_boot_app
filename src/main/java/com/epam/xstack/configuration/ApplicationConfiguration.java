@@ -23,6 +23,7 @@ public class ApplicationConfiguration {
         return username -> userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found in db"));
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -30,10 +31,12 @@ public class ApplicationConfiguration {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
