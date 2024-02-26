@@ -4,24 +4,45 @@ import com.epam.xstack.aspects.trainee_aspects.end_points_aspects.annotations.*;
 import com.epam.xstack.exceptions.validator.NotNullValidation;
 import com.epam.xstack.models.dto.trainee_dto.request.*;
 import com.epam.xstack.models.dto.trainee_dto.response.*;
+import com.epam.xstack.models.entity.Trainee;
 import com.epam.xstack.service.trainee_service.TraineeService;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api/trainees")
-@RequiredArgsConstructor
 public class TraineeController {
     private final TraineeService traineeService;
     private final NotNullValidation validation;
+    private List<Trainee> traineeList;
+    private final MeterRegistry registry;
+
+    public Supplier<Number> fetchUserCount() {
+        return () -> traineeList.size();
+    }
+
+    @Autowired
+    public TraineeController(TraineeService traineeService, NotNullValidation validation, MeterRegistry registry) {
+        this.traineeService = traineeService;
+        this.validation = validation;
+        this.registry = registry;
+        Gauge.builder("trainee.controller.trainee.count", fetchUserCount())
+                .tag("version", "gym.app")
+                .description("Trainee Controller description")
+                .register(registry);
+    }
 
     @Operation(summary = "Save Trainee to database",
             responses = {
@@ -34,6 +55,7 @@ public class TraineeController {
         validation.nullValidation(result);
         return ResponseEntity.ok(traineeService.saveTrainee(request));
     }
+
     @Operation(summary = "Get Trainee by user name",
             responses = {
                     @ApiResponse(responseCode = "200", description = "User selected successfully"),

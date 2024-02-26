@@ -1,5 +1,6 @@
 package com.epam.xstack.service.trainer_service.impl;
 
+import com.epam.xstack.actuators.prometheuses.UserSessionMetrics;
 import com.epam.xstack.aspects.trainer_aspects.authentication_aspects.annotations.*;
 import com.epam.xstack.configuration.jwt_config.JwtService;
 import com.epam.xstack.exceptions.exception.UserIdNotFoundException;
@@ -8,7 +9,10 @@ import com.epam.xstack.exceptions.generator.PasswordUserNameGenerator;
 import com.epam.xstack.exceptions.validator.ActivationValidator;
 import com.epam.xstack.exceptions.validator.UserNameExistenceValidator;
 import com.epam.xstack.mapper.trainee_mapper.TraineeMapper;
-import com.epam.xstack.mapper.trainer_mapper.*;
+import com.epam.xstack.mapper.trainer_mapper.TrainerActivateDeActivateMapper;
+import com.epam.xstack.mapper.trainer_mapper.TrainerProfileSelectRequestMapper;
+import com.epam.xstack.mapper.trainer_mapper.TrainerProfileUpdateRequestMapper;
+import com.epam.xstack.mapper.trainer_mapper.TrainerTrainingsListMapper;
 import com.epam.xstack.mapper.training_mapper.TrainingListMapper;
 import com.epam.xstack.models.dto.trainer_dto.request.*;
 import com.epam.xstack.models.dto.trainer_dto.response.*;
@@ -23,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +42,8 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerActivateDeActivateMapper activateDeActivateTrainerMapper;
     private final TrainerTrainingsListMapper trainerTrainingsListMapper;
     private final ActivationValidator checkActivation;
+    private final UserSessionMetrics userSessionMetrics;
+    private AtomicInteger activeSessions = new AtomicInteger(0);
 
     @Override
     @SelectTrainerTrainingsListAspectAnnotation
@@ -145,6 +152,8 @@ public class TrainerServiceImpl implements TrainerService {
         checkUserNameExistence.userNameExists(createdUserName);
 
         trainerRepository.save(createTrainer);
+        activeSessions.incrementAndGet();
+        userSessionMetrics.incrementActiveSessions();
         var jwtToken = jwtService.generateToken(createTrainer);
         return TrainerRegistrationResponseDTO
                 .builder()

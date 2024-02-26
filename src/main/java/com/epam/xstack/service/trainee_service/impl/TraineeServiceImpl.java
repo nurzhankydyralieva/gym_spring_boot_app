@@ -1,5 +1,6 @@
 package com.epam.xstack.service.trainee_service.impl;
 
+import com.epam.xstack.actuators.prometheuses.UserSessionMetrics;
 import com.epam.xstack.aspects.trainee_aspects.dao_aspects.annotations.*;
 import com.epam.xstack.configuration.jwt_config.JwtService;
 import com.epam.xstack.exceptions.exception.UserIdNotFoundException;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,9 @@ public class TraineeServiceImpl implements TraineeService {
     private final TraineeActivateDeActivateMapper activateDeActivateTraineeMapper;
     private final TraineeTrainingsListMapper traineeTrainingsListMapper;
     private final TraineesTrainerListUpdateMapper traineesTrainerListUpdateMapper;
+    private final UserSessionMetrics userSessionMetrics;
+    private AtomicInteger activeSessions = new AtomicInteger(0);
+
 
     @Override
     @SaveTraineeAspectAnnotation
@@ -57,6 +62,8 @@ public class TraineeServiceImpl implements TraineeService {
 
         checkUserNameExistence.userNameExists(createdUserName);
         traineeRepository.save(createTrainee);
+        activeSessions.incrementAndGet();
+        userSessionMetrics.incrementActiveSessions();
         var jwtToken = jwtService.generateToken(createTrainee);
         return TraineeRegistrationResponseDTO
                 .builder()
@@ -150,6 +157,8 @@ public class TraineeServiceImpl implements TraineeService {
 
         if (traineeId.getUsername().equals(requestDTO.getUserName())) {
             traineeRepository.deleteById(traineeId.getId());
+            activeSessions.decrementAndGet();
+            userSessionMetrics.decrementActiveSessions();
             return TraineeOkResponseDTO
                     .builder()
                     .response("Trainee is deleted from database")

@@ -4,11 +4,14 @@ import com.epam.xstack.aspects.training_aspects.annotations.SaveTrainingEndPoint
 import com.epam.xstack.exceptions.validator.NotNullValidation;
 import com.epam.xstack.models.dto.training_dto.request.TrainingSaveRequestDTO;
 import com.epam.xstack.models.dto.training_dto.response.TrainingSaveResponseDTO;
+import com.epam.xstack.models.entity.Training;
 import com.epam.xstack.service.training_service.TrainingService;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,12 +20,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 @RestController
 @RequestMapping("/api/trainings")
-@RequiredArgsConstructor
 public class TrainingController {
     private final TrainingService trainingService;
     private final NotNullValidation validation;
+    private List<Training> trainingList;
+    private final MeterRegistry registry;
+
+    public Supplier<Number> fetchTrainingCount() {
+        return () -> trainingList.size();
+    }
+
+    @Autowired
+    public TrainingController(TrainingService trainingService, NotNullValidation validation, MeterRegistry registry) {
+        this.trainingService = trainingService;
+        this.validation = validation;
+        this.registry = registry;
+        Gauge.builder("training.controller.training.count", fetchTrainingCount())
+                .tag("version", "gym.app")
+                .description("Training Controller description")
+                .register(registry);
+    }
 
     @Operation(summary = "Save Training to database",
             responses = {

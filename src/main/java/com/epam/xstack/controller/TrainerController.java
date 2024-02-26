@@ -4,24 +4,45 @@ import com.epam.xstack.aspects.trainer_aspects.end_points_aspects.annotations.*;
 import com.epam.xstack.exceptions.validator.NotNullValidation;
 import com.epam.xstack.models.dto.trainer_dto.request.*;
 import com.epam.xstack.models.dto.trainer_dto.response.*;
+import com.epam.xstack.models.entity.Trainer;
 import com.epam.xstack.service.trainer_service.TrainerService;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api/trainers")
-@RequiredArgsConstructor
 public class TrainerController {
     private final TrainerService trainerService;
     private final NotNullValidation validation;
+    private List<Trainer> trainerList;
+    private final MeterRegistry registry;
+
+    public Supplier<Number> fetchUserCount() {
+        return () -> trainerList.size();
+    }
+
+    @Autowired
+    public TrainerController(TrainerService trainerService, NotNullValidation validation, MeterRegistry registry) {
+        this.trainerService = trainerService;
+        this.validation = validation;
+        this.registry = registry;
+        Gauge.builder("trainer.controller.trainer.count", fetchUserCount())
+                .tag("version", "gym.app")
+                .description("Trainer Controller description")
+                .register(registry);
+    }
 
     @Operation(summary = "Save Trainer to database",
             responses = {
@@ -34,6 +55,7 @@ public class TrainerController {
         validation.nullValidation(result);
         return ResponseEntity.ok(trainerService.saveTrainer(request));
     }
+
     @Operation(summary = "Get Trainer by user name",
             responses = {
                     @ApiResponse(responseCode = "200", description = "User selected successfully"),
