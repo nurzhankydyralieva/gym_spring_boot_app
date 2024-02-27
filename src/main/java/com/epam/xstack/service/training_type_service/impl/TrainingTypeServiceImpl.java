@@ -8,12 +8,14 @@ import com.epam.xstack.models.entity.TrainingType;
 import com.epam.xstack.repository.TrainingTypeRepository;
 import com.epam.xstack.service.training_type_service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Profile(value = {"local", "dev", "prod", "stg"})
 public class TrainingTypeServiceImpl implements TrainingTypeService {
     private final TrainingTypeRepository repository;
 

@@ -31,7 +31,7 @@ public class AuthenticationController {
     private final MeterRegistry registry;
 
     public Supplier<Number> fetchUserCount() {
-        return () -> userList.size();
+        return () -> userList.stream().count();
     }
 
     @Autowired

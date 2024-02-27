@@ -28,5 +28,4 @@ public class Trainee extends User {
     private Date dateOfBirth;
     @Column(name = "address")
     private String address;
-
 }

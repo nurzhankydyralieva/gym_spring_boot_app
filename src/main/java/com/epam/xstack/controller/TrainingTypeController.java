@@ -28,7 +28,7 @@ public class TrainingTypeController {
     private final MeterRegistry registry;
 
     public Supplier<Number> fetchTrainingTypeCount() {
-        return () -> trainingTypeList.size();
+        return () -> trainingTypeList.stream().count();
     }
 
     public TrainingTypeController(TrainingTypeService trainingTypeService, NotNullValidation validation, MeterRegistry registry) {

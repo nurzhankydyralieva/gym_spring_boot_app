@@ -19,6 +19,7 @@ import com.epam.xstack.models.enums.Role;
 import com.epam.xstack.repository.TraineeRepository;
 import com.epam.xstack.service.trainee_service.TraineeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
+@Profile(value = {"local","dev","prod","stg"})
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final PasswordUserNameGenerator generator;

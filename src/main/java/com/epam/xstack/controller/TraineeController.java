@@ -30,7 +30,7 @@ public class TraineeController {
     private final MeterRegistry registry;
 
     public Supplier<Number> fetchUserCount() {
-        return () -> traineeList.size();
+        return () -> traineeList.stream().count();
     }
 
     @Autowired

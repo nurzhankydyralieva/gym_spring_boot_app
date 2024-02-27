@@ -22,6 +22,7 @@ import com.epam.xstack.models.enums.Role;
 import com.epam.xstack.repository.TrainerRepository;
 import com.epam.xstack.service.trainer_service.TrainerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
+@Profile(value = {"local","dev","prod","stg"})
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
     private final PasswordUserNameGenerator generator;

@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TrainingSaveRequestDTO {
-    @NotBlank(message = "Trainee user name should not be empty")
+   @NotBlank(message = "Trainee user name should not be empty")
     Trainee traineeUserName;
     @NotBlank(message = "Trainer user name should not be empty")
     Trainer trainerUserName;

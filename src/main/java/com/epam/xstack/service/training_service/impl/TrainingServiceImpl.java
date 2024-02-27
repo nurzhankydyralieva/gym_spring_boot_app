@@ -9,10 +9,12 @@ import com.epam.xstack.models.enums.Code;
 import com.epam.xstack.repository.TrainingRepository;
 import com.epam.xstack.service.training_service.TrainingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Profile(value = {"local","dev","prod","stg"})
 public class TrainingServiceImpl implements TrainingService {
     private final TrainingRepository trainingRepository;
 

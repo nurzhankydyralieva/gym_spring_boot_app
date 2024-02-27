@@ -14,6 +14,7 @@ import com.epam.xstack.models.enums.Code;
 import com.epam.xstack.repository.UserRepository;
 import com.epam.xstack.service.authentication_service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Profile(value = {"local","dev","prod","stg"})
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final JwtService jwtService;

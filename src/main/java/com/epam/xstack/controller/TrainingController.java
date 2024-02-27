@@ -32,7 +32,7 @@ public class TrainingController {
     private final MeterRegistry registry;
 
     public Supplier<Number> fetchTrainingCount() {
-        return () -> trainingList.size();
+        return () -> trainingList.stream().count();
     }
 
     @Autowired

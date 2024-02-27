@@ -20,6 +20,9 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private static final String[] WHITE_LIST_URL = {
+            "/api/trainees/register",
+            "/api/trainers/register",
+            "/api/auth/**",
             "/actuator/**",
             "/v2/api-docs",
             "/v3/api-docs",
@@ -41,8 +44,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers(WHITE_LIST_URL)
                 .permitAll()
-
-                .requestMatchers("/api/auth/**", "/api/trainees/**", "/api/trainers/**","/api/**")
+                .requestMatchers("/api/trainees/**", "/api/trainers/**","/api/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
