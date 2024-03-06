@@ -10,6 +10,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api/training_types")
+@SecurityRequirement(name = "gym_spring_boot_application")
 public class TrainingTypeController {
     private final TrainingTypeService trainingTypeService;
     private final NotNullValidation validation;
